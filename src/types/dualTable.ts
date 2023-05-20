@@ -8,7 +8,6 @@ export const Soundtrack = Type.Object({
 export const PeliculaGuionista = Type.Object({
   id_pelicula: Type.String(),
   id_persona: Type.String(),
-  salario: Type.Number(),
 });
 
 export const PeliculaEstudio = Type.Object({
