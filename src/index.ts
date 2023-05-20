@@ -11,6 +11,7 @@ import cancionRoute from "./routes/cancion";
 import soundtrackRoute from "./routes/soundtrack";
 import personajeRoute from "./routes/personaje";
 import adaptacionRoute from "./routes/adaptacion";
+import cancionPersonaRoute from "./routes/cancion_persona";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 
 const server: FastifyInstance = Fastify({
@@ -29,6 +30,7 @@ server.register(cancionRoute, { prefix: "cancion" });
 server.register(soundtrackRoute, { prefix: "soundtrack" });
 server.register(personajeRoute, { prefix: "personaje" });
 server.register(adaptacionRoute, { prefix: "adaptacion" });
+server.register(cancionPersonaRoute, { prefix: "cancionpersona" });
 
 server.get("/", async (_req, rep) => {
   rep.type("text/html");
