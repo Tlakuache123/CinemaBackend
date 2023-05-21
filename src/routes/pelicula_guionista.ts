@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
-import { PeliculaGuionista, PeliculaGuionistaType } from "./../types/dualTable";
+import { PeliculaGenero, PeliculaGuionista, PeliculaGuionistaType } from "./../types/dualTable";
 import { Id, IdType } from "../types/idType";
-import { FastifyPluginAsyncTypebox } from "@fastify/type-provider-typebox";
+import { FastifyPluginAsyncTypebox, Type } from "@fastify/type-provider-typebox";
 
 const peliculaGuionistaRoute: FastifyPluginAsyncTypebox = async (
   fastify: FastifyInstance,
@@ -110,10 +110,10 @@ JOIN pelicula AS pe ON pegu.id_pelicula = pe.id_pelicula`
   });
 
   fastify.get(
-    "/full/:cancion/:persona",
+    "/full/:id_pelicula/:id_persona",
     {
       schema: {
-        params: PeliculaGuionista,
+        params: PeliculaGuionista 
       },
     },
     async (req, _res) => {

@@ -13,7 +13,7 @@ export const PeliculaGuionista = Type.Object({
 export const PeliculaEstudio = Type.Object({
   id_pelicula: Type.String(),
   id_estudio: Type.String(),
-  financiamiento: Type.Number(),
+  financiamiento: Type.Optional(Type.Number()),
 });
 
 export const PeliculaGenero = Type.Object({
