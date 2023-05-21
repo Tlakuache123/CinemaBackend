@@ -1,16 +1,21 @@
 import { FastifyInstance } from "fastify";
-import { PeliculaGuionista, PeliculaGuionistaType } from "./../types/dualTable";
-import { Id, IdType } from "../types/idType";
+import {
+  PeliculaGenero,
+  PeliculaGeneroType,
+  PeliculaGuionista,
+  PeliculaGuionistaType,
+} from "./../types/dualTable";
+import { Id, IdType, LongId, LongIdType } from "../types/idType";
 import { FastifyPluginAsyncTypebox } from "@fastify/type-provider-typebox";
 
-const peliculaGuionistaRoute: FastifyPluginAsyncTypebox = async (
+const peliculaGeneroRoute: FastifyPluginAsyncTypebox = async (
   fastify: FastifyInstance,
   _options: any
 ) => {
   fastify.get("/", async (_req, _res) => {
     const client = await fastify.pg.connect();
     try {
-      const { rows } = await client.query("SELECT * FROM pelicula_guionista");
+      const { rows } = await client.query("SELECT * FROM pelicula_genero");
       return rows;
     } catch (err) {
       return { error: err };
@@ -20,19 +25,19 @@ const peliculaGuionistaRoute: FastifyPluginAsyncTypebox = async (
   });
 
   fastify.get(
-    "/:pelicula/:persona",
+    "/:pelicula/:genero",
     {
       schema: {
-        params: PeliculaGuionista,
+        params: PeliculaGenero,
       },
     },
     async (req, _res) => {
-      const { id_pelicula, id_persona } = req.params as PeliculaGuionistaType;
+      const { id_pelicula, genero } = req.params as PeliculaGeneroType;
       const client = await fastify.pg.connect();
       try {
         const { rows } = await client.query(
-          "SELECT * FROM pelicula_guionista WHERE id_pelicula = $1 AND id_persona = $2",
-          [id_pelicula, id_persona]
+          "SELECT * FROM pelicula_genero WHERE id_pelicula = $1 AND genero = $2",
+          [id_pelicula, genero]
         );
         return rows;
       } catch (err) {
@@ -55,7 +60,7 @@ const peliculaGuionistaRoute: FastifyPluginAsyncTypebox = async (
       const client = await fastify.pg.connect();
       try {
         const { rows } = await client.query(
-          "SELECT * FROM pelicula_guionista WHERE id_pelicula = $1",
+          "SELECT * FROM pelicula_genero WHERE id_pelicula = $1",
           [id]
         );
         return rows;
@@ -68,18 +73,18 @@ const peliculaGuionistaRoute: FastifyPluginAsyncTypebox = async (
   );
 
   fastify.get(
-    "/:id/guionista",
+    "/:id/genero",
     {
       schema: {
-        params: Id,
+        params: LongId,
       },
     },
     async (req, _res) => {
-      const { id } = req.params as IdType;
+      const { id } = req.params as LongIdType;
       const client = await fastify.pg.connect();
       try {
         const { rows } = await client.query(
-          "SELECT * FROM pelicula_guionista WHERE id_persona = $1",
+          "SELECT * FROM pelicula_genero WHERE genero = $1",
           [id]
         );
         return rows;
@@ -97,9 +102,8 @@ const peliculaGuionistaRoute: FastifyPluginAsyncTypebox = async (
       const { rows } = await client.query(
         `
 SELECT * 
-FROM pelicula_guionista AS pegu 
-JOIN guionista AS gu ON pegu.id_persona = gu.id_persona 
-JOIN pelicula AS pe ON pegu.id_pelicula = pe.id_pelicula`
+FROM pelicula_genero AS pege 
+JOIN pelicula AS pe ON pege.id_pelicula = pe.id_pelicula`
       );
       return rows;
     } catch (err) {
@@ -110,10 +114,10 @@ JOIN pelicula AS pe ON pegu.id_pelicula = pe.id_pelicula`
   });
 
   fastify.get(
-    "/full/:cancion/:persona",
+    "/full/:pelicula/:genero",
     {
       schema: {
-        params: PeliculaGuionista,
+        params: PeliculaGenero,
       },
     },
     async (req, _res) => {
@@ -123,10 +127,9 @@ JOIN pelicula AS pe ON pegu.id_pelicula = pe.id_pelicula`
         const { rows } = await client.query(
           `
 SELECT * 
-FROM pelicula_guionista AS pegu 
-JOIN guionista AS gu ON pegu.id_persona = gu.id_persona 
-JOIN pelicula AS pe ON pegu.id_pelicula = pe.id_pelicula
-WHERE pegu.id_pelicula = $1 AND pegu.id_persona = $2`,
+FROM pelicula_genero AS pege 
+JOIN pelicula AS pe ON pege.id_pelicula = pe.id_pelicula
+WHERE pege.id_pelicula = $1, pege.genero = $2`,
           [id_pelicula, id_persona]
         );
         return rows;
@@ -138,27 +141,27 @@ WHERE pegu.id_pelicula = $1 AND pegu.id_persona = $2`,
     }
   );
 
-  fastify.post<{ Body: PeliculaGuionistaType; Reply: PeliculaGuionistaType }>(
+  fastify.post<{ Body: PeliculaGeneroType; Reply: PeliculaGeneroType }>(
     "/",
     {
       schema: {
-        body: PeliculaGuionista,
+        body: PeliculaGenero,
         response: {
-          200: PeliculaGuionista,
+          200: PeliculaGenero,
         },
       },
     },
     (req, res) => {
-      let { id_pelicula, id_persona } = req.body;
+      let { id_pelicula, genero } = req.body;
       const onConnect = (err: any, client: any, release: any) => {
         if (err) return res.send(err);
 
         client.query(
-          "INSERT INTO pelicula_guionista(id_pelicula, id_persona) VALUES($1, $2)",
-          [id_pelicula, id_persona],
+          "INSERT INTO pelicula_genero(id_pelicula, genero) VALUES($1, $2)",
+          [id_pelicula, genero],
           (err: any, _result: any) => {
             release();
-            res.send(err || { id_pelicula, id_persona });
+            res.send(err || { id_pelicula, genero });
           }
         );
       };
@@ -167,21 +170,21 @@ WHERE pegu.id_pelicula = $1 AND pegu.id_persona = $2`,
     }
   );
 
-  fastify.delete<{ Body: PeliculaGuionistaType }>(
+  fastify.delete<{ Body: PeliculaGeneroType }>(
     "/",
     {
       schema: {
-        body: PeliculaGuionista,
+        body: PeliculaGenero,
       },
     },
     (req, res) => {
-      let { id_pelicula, id_persona } = req.body;
+      let { id_pelicula, genero } = req.body;
       const onConnect = (err: any, client: any, release: any) => {
         if (err) return res.send(err);
 
         client.query(
-          "DELETE FROM pelicula_guionista WHERE id_pelicula = $1 AND id_persona = $2",
-          [id_pelicula, id_persona],
+          "DELETE FROM pelicula_genero WHERE id_pelicula = $1 AND genero = $2",
+          [id_pelicula, genero],
           (err: any, _result: any) => {
             release();
             if (err) {
@@ -198,4 +201,4 @@ WHERE pegu.id_pelicula = $1 AND pegu.id_persona = $2`,
   );
 };
 
-export default peliculaGuionistaRoute;
+export default peliculaGeneroRoute;
