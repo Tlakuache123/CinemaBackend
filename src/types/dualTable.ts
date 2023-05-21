@@ -26,8 +26,16 @@ export const CancionPersona = Type.Object({
   artista: Type.String(),
 });
 
+export const PeliculaDirector = Type.Object({
+  id_pelicula: Type.String(),
+  id_persona: Type.String(),
+  tipo_direccion: Type.Optional(Type.String()),
+  salario: Type.Number(),
+});
+
 export type SoundtrackType = Static<typeof Soundtrack>;
 export type PeliculaGuionistaType = Static<typeof PeliculaGuionista>;
 export type PeliculaEstudioType = Static<typeof PeliculaEstudio>;
 export type PeliculaGeneroType = Static<typeof PeliculaGenero>;
 export type CancionPersonaType = Static<typeof CancionPersona>;
+export type PeliculaDirectorType = Static<typeof PeliculaDirector>;
