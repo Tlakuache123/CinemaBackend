@@ -19,10 +19,16 @@ import peliculaGeneroRoute from "./routes/pelicula_genero";
 import peliculaEstudioRoute from "./routes/pelicula_estudio";
 import peliculaDirectorRoute from "./routes/pelicula_director";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
+import path from "path";
 
 const server: FastifyInstance = Fastify({
   logger: true,
 }).withTypeProvider<TypeBoxTypeProvider>();
+
+server.register(require("@fastify/static"), {
+  root: path.join(__dirname, "../build"),
+  prefix: "/public/",
+});
 
 server.register(cors, {});
 
@@ -59,7 +65,7 @@ server.get("/", async (_req, rep) => {
 
 const start = async () => {
   try {
-    await server.listen({ port: 3000 });
+    await server.listen({ port: 5173 });
 
     const address = server.server.address();
     const port = typeof address === "string" ? address : address?.port;
