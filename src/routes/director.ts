@@ -51,9 +51,7 @@ const directorRoute: FastifyPluginAsyncTypebox = async (
   fastify.get("/full", async (_req, _res) => {
     const client = await fastify.pg.connect();
     try {
-      const { rows } = await client.query(
-        "SELECT * FROM director dic JOIN persona pe ON dic.id_persona = pe.id_persona"
-      );
+      const { rows } = await client.query("SELECT * FROM vista_directores");
       return rows;
     } catch (err) {
       return { error: err };
@@ -79,7 +77,7 @@ const directorRoute: FastifyPluginAsyncTypebox = async (
       const client = await fastify.pg.connect();
       try {
         const { rows } = await client.query(
-          "SELECT * FROM director dic JOIN persona pe ON dic.id_persona = pe.id_persona WHERE dic.id_persona = $1",
+          "SELECT * FROM vista_directores WHERE id_persona = $1",
           [id]
         );
         return rows;
@@ -102,7 +100,7 @@ const directorRoute: FastifyPluginAsyncTypebox = async (
       },
     },
     (req, res) => {
-      let { id, numero_pelicula} = req.body;
+      let { id, numero_pelicula } = req.body;
       const onConnect = (err: any, client: any, release: any) => {
         if (err) return res.send(err);
 

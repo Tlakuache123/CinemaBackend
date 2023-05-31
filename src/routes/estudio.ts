@@ -11,7 +11,7 @@ const estudioRoute: FastifyPluginAsyncTypebox = async (
   fastify.get("/", async (_req, _res) => {
     const client = await fastify.pg.connect();
     try {
-      const { rows } = await client.query("SELECT * FROM estudio");
+      const { rows } = await client.query("SELECT * FROM vista_estudios");
       return rows;
     } catch (err) {
       return { error: err };

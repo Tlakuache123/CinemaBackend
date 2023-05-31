@@ -51,9 +51,7 @@ const actorRoute: FastifyPluginAsyncTypebox = async (
   fastify.get("/full", async (_req, _res) => {
     const client = await fastify.pg.connect();
     try {
-      const { rows } = await client.query(
-        "SELECT * FROM actor ac JOIN persona pe ON ac.id_persona = pe.id_persona"
-      );
+      const { rows } = await client.query("SELECT * FROM vista_actores");
       return rows;
     } catch (err) {
       return { error: err };
@@ -79,7 +77,7 @@ const actorRoute: FastifyPluginAsyncTypebox = async (
       const client = await fastify.pg.connect();
       try {
         const { rows } = await client.query(
-          "SELECT * FROM actor ac JOIN persona pe ON ac.id_persona = pe.id_persona WHERE ac.id_persona = $1",
+          "SELECT * FROM vista_actores WHERE id_persona = $1",
           [id]
         );
         return rows;
