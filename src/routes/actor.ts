@@ -52,7 +52,7 @@ const actorRoute: FastifyPluginAsyncTypebox = async (
     const client = await fastify.pg.connect();
     try {
       const { rows } = await client.query(
-        "SELECT * FROM guionista gui JOIN persona pe ON gui.id_persona = pe.id_persona"
+        "SELECT * FROM actor ac JOIN persona pe ON ac.id_persona = pe.id_persona"
       );
       return rows;
     } catch (err) {

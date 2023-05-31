@@ -1,4 +1,6 @@
 import Fastify, { FastifyInstance } from "fastify";
+import cors from "@fastify/cors";
+
 import dbConnector from "./dbconnector";
 import paisRoute from "./routes/pais";
 import personaRoute from "./routes/persona";
@@ -21,6 +23,8 @@ import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 const server: FastifyInstance = Fastify({
   logger: true,
 }).withTypeProvider<TypeBoxTypeProvider>();
+
+server.register(cors, {});
 
 server.register(dbConnector);
 server.register(paisRoute, { prefix: "pais" });
