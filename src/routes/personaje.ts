@@ -49,7 +49,7 @@ const personajeRoute: FastifyPluginAsyncTypebox = async (
   );
 
   fastify.get(
-    "/:id/personaje",
+    "/:id/persona",
     {
       schema: {
         params: {
@@ -65,7 +65,10 @@ const personajeRoute: FastifyPluginAsyncTypebox = async (
       const client = await fastify.pg.connect();
       try {
         const { rows } = await client.query(
-          "SELECT * FROM personaje WHERE personaje = $1",
+          `SELECT * 
+          FROM personaje per
+          JOIN pelicula pel ON per.id_pelicula = pel.id_pelicula
+          WHERE id_persona = $1`,
           [id]
         );
         return rows;
@@ -165,7 +168,7 @@ const personajeRoute: FastifyPluginAsyncTypebox = async (
         if (err) return res.send(err);
 
         client.query(
-          "DELETE FROM pelicula WHERE id_pelicula = $1 AND personaje = $2",
+          "DELETE FROM personaje WHERE id_pelicula = $1 AND personaje = $2",
           [id_pelicula, personaje],
           (err: any, _result: any) => {
             release();

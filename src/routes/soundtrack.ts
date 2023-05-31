@@ -65,7 +65,10 @@ const soundtrackRoute: FastifyPluginAsyncTypebox = async (
       const client = await fastify.pg.connect();
       try {
         const { rows } = await client.query(
-          "SELECT * FROM soundtrack WHERE nombre_cancion = $1",
+          `SELECT * 
+          FROM soundtrack so
+          JOIN pelicula pe ON so.id_pelicula = pe.id_pelicula
+          WHERE nombre_cancion = $1`,
           [id]
         );
         return rows;
