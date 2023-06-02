@@ -65,10 +65,7 @@ const personajeRoute: FastifyPluginAsyncTypebox = async (
       const client = await fastify.pg.connect();
       try {
         const { rows } = await client.query(
-          `SELECT * 
-          FROM personaje per
-          JOIN pelicula pel ON per.id_pelicula = pel.id_pelicula
-          WHERE id_persona = $1`,
+          `SELECT * FROM obtener_personajes_por_actor($1)`,
           [id]
         );
         return rows;

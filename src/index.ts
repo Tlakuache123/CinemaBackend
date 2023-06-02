@@ -1,6 +1,9 @@
-import Fastify, { FastifyInstance } from "fastify";
-import cors from "@fastify/cors";
+import * as dotenv from "dotenv";
+dotenv.config();
 
+import Fastify, { FastifyInstance } from "fastify";
+import fastify from "fastify";
+import cors from "@fastify/cors";
 import dbConnector from "./dbconnector";
 import paisRoute from "./routes/pais";
 import personaRoute from "./routes/persona";
@@ -21,51 +24,83 @@ import peliculaDirectorRoute from "./routes/pelicula_director";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import path from "path";
 
-const server: FastifyInstance = Fastify({
+declare module "fastify" {
+  interface FastifyInstance {
+    config: {
+      PORT: number;
+      DBURL: string;
+    };
+  }
+}
+
+const server: FastifyInstance = fastify({
   logger: true,
 }).withTypeProvider<TypeBoxTypeProvider>();
 
-server.register(require("@fastify/static"), {
-  root: path.join(__dirname, "../build"),
-  prefix: "/public/",
-});
+const schema = {
+  type: "object",
+  required: ["PORT", "DBURL"],
+  properties: {
+    PORT: {
+      type: "number",
+      default: 5300,
+    },
+    DBURL: {
+      type: "string",
+    },
+  },
+};
 
-server.register(cors, {});
+const options = {
+  dotenv: true,
+  schema: schema,
+};
 
-server.register(dbConnector);
-server.register(paisRoute, { prefix: "pais" });
-server.register(personaRoute, { prefix: "persona" });
-server.register(actorRoute, { prefix: "actor" });
-server.register(directorRoute, { prefix: "director" });
-server.register(estudioRoute, { prefix: "estudio" });
-server.register(guionistaRoute, { prefix: "guionista" });
-server.register(peliculaRoute, { prefix: "pelicula" });
-server.register(cancionRoute, { prefix: "cancion" });
-server.register(soundtrackRoute, { prefix: "soundtrack" });
-server.register(personajeRoute, { prefix: "personaje" });
-server.register(adaptacionRoute, { prefix: "adaptacion" });
-server.register(cancionPersonaRoute, { prefix: "cancionpersona" });
-server.register(peliculaGuionistaRoute, { prefix: "peliculaguionista" });
-server.register(peliculaGeneroRoute, { prefix: "peliculagenero" });
-server.register(peliculaEstudioRoute, { prefix: "peliculaestudio" });
-server.register(peliculaDirectorRoute, { prefix: "peliculadirector" });
+const initialize = async () => {
+  server.register(require("@fastify/env"), options).ready((err) => {
+    if (err) console.error(err);
+  });
+  await server.after();
 
-server.get("/", async (_req, rep) => {
-  rep.type("text/html");
-  return `<h1>Proyecto de base de datos</h1>
-    <h2>Aplicacion de Peliculas :)</h2>
-      <ul>
-        <li>Claudio</li>
-        <li>Diego</li>
-        <li>Kevin</li>
-        <li>Sofia</li>
-        <li>La amiga de Sofia xd</li>
-      </ul>`;
-});
+  const url = server.config.DBURL;
+
+  server.register(require("@fastify/postgres"), {
+    connectionString: url,
+  });
+
+  server.register(require("@fastify/static"), {
+    root: path.join(__dirname, "../build"),
+    prefix: "/",
+  });
+
+  server.register(cors, {});
+
+  //server.register(dbConnector);
+  server.register(paisRoute, { prefix: "api/pais" });
+  server.register(personaRoute, { prefix: "api/persona" });
+  server.register(actorRoute, { prefix: "api/actor" });
+  server.register(directorRoute, { prefix: "api/director" });
+  server.register(estudioRoute, { prefix: "api/estudio" });
+  server.register(guionistaRoute, { prefix: "api/guionista" });
+  server.register(peliculaRoute, { prefix: "api/pelicula" });
+  server.register(cancionRoute, { prefix: "api/cancion" });
+  server.register(soundtrackRoute, { prefix: "api/soundtrack" });
+  server.register(personajeRoute, { prefix: "api/personaje" });
+  server.register(adaptacionRoute, { prefix: "api/adaptacion" });
+  server.register(cancionPersonaRoute, { prefix: "api/cancionpersona" });
+  server.register(peliculaGuionistaRoute, { prefix: "api/peliculaguionista" });
+  server.register(peliculaGeneroRoute, { prefix: "api/peliculagenero" });
+  server.register(peliculaEstudioRoute, { prefix: "api/peliculaestudio" });
+  server.register(peliculaDirectorRoute, { prefix: "api/peliculadirector" });
+
+  await server.after();
+  start();
+};
 
 const start = async () => {
   try {
-    await server.listen({ port: 5173 });
+    const p = server.config.PORT;
+    await server.listen({ port: p });
 
     const address = server.server.address();
     const port = typeof address === "string" ? address : address?.port;
@@ -76,4 +111,5 @@ const start = async () => {
     process.exit(1);
   }
 };
-start();
+
+initialize();

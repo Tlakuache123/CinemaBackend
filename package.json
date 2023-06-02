@@ -6,19 +6,22 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./dist/index.js",
-    "start_dev": "node ./dist/index.js | pino-pretty",
+    "start_logs": "node ./dist/index.js | pino-pretty",
     "dev": "nodemon ./src/index.ts | pino-pretty",
-    "build": "tsc"
+    "build": "tsc",
+    "start_build": "npm run build && npm run start"
   },
   "author": "Araujo Claudio",
   "license": "ISC",
   "dependencies": {
     "@fastify/cors": "^8.2.1",
+    "@fastify/env": "^4.2.0",
     "@fastify/postgres": "^5.2.0",
     "@fastify/static": "^6.10.2",
     "@fastify/type-provider-typebox": "^3.2.0",
     "@sinclair/typebox": "^0.28.10",
     "@types/pg": "^8.6.6",
+    "dotenv": "^16.1.3",
     "fastify": "^4.17.0",
     "fastify-plugin": "^4.5.0",
     "nanoid": "^3.3.4",
